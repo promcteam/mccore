@@ -163,39 +163,52 @@ public class VersionManager
      */
     public static void initialize(String vs)
     {
-        try
-        {
-            int i = vs.indexOf("MC:") + 4;
-            int j = vs.indexOf(")", i);
-            if (i < 0 || j < 0) return;
-            String v = vs.substring(i, j);
-            String[] pieces = v.split("\\.");
-            version = Integer.parseInt(pieces[0]) * 10000 + Integer.parseInt(pieces[1]) * 100;
-            if (pieces.length > 2)
+    	if (Bukkit.getServer().getVersion().contains("Paper") && Bukkit.getServer().getVersion().contains("1.16.5")) {
+    		server = ServerType.UNKNOWN;
+    		try {
+    			OfflinePlayer.class.getDeclaredMethod("getUniqueId");
+    			version = 99999;
+    		} catch (Exception exe) 
+    		{
+    			version = V1_7_2;
+    		}
+    		Bukkit.getLogger().info("Server version: " + version);
+    	} else 
+    	{
+    		try
             {
-                version += Integer.parseInt(pieces[2]);
-            }
-            Bukkit.getLogger().info("Server version: " + version);
-        }
-
-        // Some error occurred, assume an up to date server with all features
-        catch (Exception ex)
-        {
-            server = ServerType.UNKNOWN;
-            if (version == -1)
-            {
-                try
+                int i = vs.indexOf("MC:") + 4;
+                int j = vs.indexOf(")", i);
+                if (i < 0 || j < 0) return;
+                String v = vs.substring(i, j);
+                String[] pieces = v.split("\\.");
+                version = Integer.parseInt(pieces[0]) * 10000 + Integer.parseInt(pieces[1]) * 100;
+                if (pieces.length > 2)
                 {
-                    OfflinePlayer.class.getDeclaredMethod("getUniqueId");
-                    version = 99999;
-                }
-                catch (Exception e)
-                {
-                    version = V1_7_2;
+                    version += Integer.parseInt(pieces[2]);
                 }
                 Bukkit.getLogger().info("Server version: " + version);
             }
-        }
+
+            // Some error occurred, assume an up to date server with all features
+            catch (Exception ex)
+            {
+                server = ServerType.UNKNOWN;
+                if (version == -1)
+                {
+                    try
+                    {
+                        OfflinePlayer.class.getDeclaredMethod("getUniqueId");
+                        version = 99999;
+                    }
+                    catch (Exception e)
+                    {
+                        version = V1_7_2;
+                    }
+                    Bukkit.getLogger().info("Server version: " + version);
+                }
+            }
+    	}
     }
 
     /**
